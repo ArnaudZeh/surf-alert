@@ -1,0 +1,78 @@
+:root {
+  /* Palette brute (fournie) */
+  --prussian-blue: #000022;
+  --deep-navy: #001242;
+  --ocean-blue: #0094c6;
+  --baltic-blue: #005e7c;
+  --ink-black: #040f16;
+
+  /* Surfaces */
+  --color-background: var(--ink-black);
+  --color-background-alt: var(--prussian-blue);
+  --color-surface: var(--deep-navy);
+  --color-surface-raised: #0a1e52;
+  --color-border: rgba(0, 148, 198, 0.16);
+  --color-border-strong: rgba(0, 148, 198, 0.4);
+
+  /* Marque */
+  --color-primary: var(--ocean-blue);
+  --color-primary-soft: rgba(0, 148, 198, 0.14);
+  --color-secondary: var(--baltic-blue);
+
+  /* Texte */
+  --color-on-background: #eaf4f8;
+  --color-on-surface: #d7e6ee;
+  --color-on-surface-muted: #9fb3c2;
+
+  /* Feu tricolore sémantique (scores) */
+  --color-success: #2ee6a6;
+  --color-success-soft: rgba(46, 230, 166, 0.14);
+  --color-warning: #ffab4c;
+  --color-warning-soft: rgba(255, 171, 76, 0.14);
+  --color-danger: #ff6b6b;
+  --color-danger-soft: rgba(255, 107, 107, 0.14);
+
+  /* Typographie */
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Plus Jakarta Sans", sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+
+  /* Espacement (base 4px) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+
+  /* Rayon */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  /* Ombres */
+  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.45);
+  --shadow-glow-primary: 0 0 0 1px rgba(0, 148, 198, 0.25),
+    0 8px 24px rgba(0, 148, 198, 0.12);
+
+  /* Mouvement */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+
+  /* Largeur de contenu partagee (header, bandeau semaine, grille de cartes) */
+  --content-max-width: 1440px;
+  --content-max-width-wide: 1680px;
+}

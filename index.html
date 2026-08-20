@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Surf Alert · Côte nord de Tahiti</title>
+  <meta name="description" content="Conditions de surf en direct pour Orofara, Ahonu, Papenoo Beach et L'embouchure, côte nord de Tahiti." />
+
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#001242" />
+  <link rel="icon" href="assets/icons/icon-source.svg" type="image/svg+xml" />
+  <link rel="icon" href="assets/icons/favicon-48.png" sizes="48x48" type="image/png" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Surf Alert" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">&#127754;</span>
+        <div>
+          <p class="eyebrow">Côte nord de Tahiti</p>
+          <h1>Surf Alert</h1>
+        </div>
+      </div>
+      <p class="header-meta" id="lastUpdated">
+        Chargement des conditions en direct…
+      </p>
+    </div>
+  </header>
+
+  <section class="week-band-section" aria-label="Aperçu de la semaine, note moyenne de tous les spots par jour">
+    <div class="week-band-inner">
+      <p class="week-band-title">
+        <span class="week-band-title-full">Semaine : note moyenne de tous les spots, par jour</span>
+        <span class="week-band-title-short">Semaine, moyenne des spots</span>
+      </p>
+      <div class="week-band" id="weekBand">
+        <!-- Pastilles generees par js/app.js -->
+      </div>
+    </div>
+  </section>
+
+  <main>
+    <section class="spots-grid" id="spotsGrid" aria-label="Conditions par spot">
+      <!-- Cartes generees par js/app.js -->
+    </section>
+    <div class="carousel-dots" id="carouselDots" aria-label="Navigation entre les spots">
+      <!-- Points generes par js/app.js, visibles en mobile uniquement -->
+    </div>
+  </main>
+
+  <div class="detail-overlay" id="detailOverlay" hidden>
+    <div class="detail-panel" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+      <!-- Le bouton fermer est injecte par js/app.js DANS .detail-header
+           (voir renderDetailContent) : il doit rester sticky avec le nom
+           du spot, pas colle au panneau qui scrolle en dessous. -->
+      <div id="detailContent"><!-- injecte par js/app.js --></div>
+    </div>
+  </div>
+
+  <script src="js/format.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/score.js"></script>
+  <script src="js/insights.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

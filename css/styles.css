@@ -1,0 +1,1441 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: radial-gradient(
+    120% 140% at 15% -10%,
+    var(--color-background-alt) 0%,
+    transparent 55%
+  ),
+  var(--color-background);
+  color: var(--color-on-background);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: var(--color-primary);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* ---------- Header ---------- */
+
+.site-header {
+  border-bottom: 1px solid var(--color-border);
+  background: linear-gradient(
+    180deg,
+    var(--color-background-alt) 0%,
+    transparent 100%
+  );
+}
+
+.header-inner {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-6) var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+@media (min-width: 1680px) {
+  .header-inner {
+    max-width: var(--content-max-width-wide);
+  }
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+  border: 1px solid var(--color-border-strong);
+  font-size: var(--text-xl);
+  flex-shrink: 0;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-on-surface-muted);
+  font-weight: 600;
+}
+
+.site-header h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.header-meta {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-on-surface-muted);
+}
+
+/* ---------- Grille de spots ---------- */
+
+.spots-grid {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6) var(--space-24);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+
+.carousel-dots {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .spots-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .spots-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-8);
+  }
+}
+
+@media (min-width: 1680px) {
+  .spots-grid {
+    max-width: var(--content-max-width-wide);
+  }
+}
+
+/* ---------- Carte spot ---------- */
+
+.spot-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-8);
+  background: linear-gradient(
+    160deg,
+    var(--color-surface) 0%,
+    var(--color-background-alt) 100%
+  );
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  transition: transform var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
+}
+
+.spot-card.is-top {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-glow-primary), var(--shadow-card);
+}
+
+.badge-top {
+  position: absolute;
+  top: calc(var(--space-8) * -1 + var(--space-3));
+  left: var(--space-8);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-primary);
+  color: var(--ink-black);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 4px 14px rgba(0, 148, 198, 0.4);
+}
+
+.card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.card-head h2 {
+  margin: 0 0 var(--space-1);
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.spot-type {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-on-surface-muted);
+}
+
+/* ---------- Pastille de statut (feu tricolore) ---------- */
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-success .status-dot {
+  background: var(--color-success);
+  box-shadow: 0 0 0 4px var(--color-success-soft);
+}
+.status-success.status-pill {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.status-warning .status-dot {
+  background: var(--color-warning);
+  box-shadow: 0 0 0 4px var(--color-warning-soft);
+}
+.status-warning.status-pill {
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+}
+
+.status-danger .status-dot {
+  background: var(--color-danger);
+  box-shadow: 0 0 0 4px var(--color-danger-soft);
+}
+.status-danger.status-pill {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.status-loading .status-dot {
+  background: var(--color-on-surface-muted);
+}
+.status-loading.status-pill {
+  background: rgba(159, 179, 194, 0.12);
+  color: var(--color-on-surface-muted);
+}
+
+/* ---------- Métriques ---------- */
+
+.card-metrics {
+  /* Marge en plus du gap du parent .spot-card : sans elle, la derniere
+     barre de repartition du score et le titre HOULE qui suit se
+     retrouvent visuellement colles l'un a l'autre. */
+  margin: var(--space-3) 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+@media (min-width: 480px) {
+  .card-metrics {
+    flex-direction: row;
+    gap: var(--space-6);
+  }
+
+  .metric-group {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.metric-group-title {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-primary);
+}
+
+.metric-rows {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.metric-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-1) 0;
+}
+
+.metric-row dt {
+  font-size: var(--text-xs);
+  color: var(--color-on-surface-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.metric-row dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-on-surface);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.metric-row dd.is-word {
+  text-transform: capitalize;
+}
+
+.metric-row dd .table-arrow {
+  margin-left: 0;
+  margin-right: var(--space-1);
+  font-size: 12px;
+  color: var(--color-primary);
+}
+
+/* ---------- Bande de score (score global + repartition) ---------- */
+
+.score-band {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.score-band-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.score-number {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-on-background);
+  line-height: 1;
+}
+
+.score-number-max {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-on-surface-muted);
+  margin-left: 2px;
+}
+
+.score-band-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-on-surface-muted);
+}
+
+.score-gauge {
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.score-gauge-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  transition: width var(--duration-base) var(--ease-out);
+}
+
+.score-gauge-fill.status-success {
+  background: var(--color-success);
+}
+.score-gauge-fill.status-warning {
+  background: var(--color-warning);
+}
+.score-gauge-fill.status-danger {
+  background: var(--color-danger);
+}
+
+.score-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.score-breakdown-item {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.score-breakdown-label {
+  font-size: var(--text-xs);
+  color: var(--color-on-surface-muted);
+  white-space: nowrap;
+}
+
+.score-breakdown-track {
+  height: 5px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.score-breakdown-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+}
+
+.score-breakdown-fill.status-success {
+  background: var(--color-success);
+}
+.score-breakdown-fill.status-warning {
+  background: var(--color-warning);
+}
+.score-breakdown-fill.status-danger {
+  background: var(--color-danger);
+}
+
+/* ---------- États utilitaires ---------- */
+
+.dev-note {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+  font-size: var(--text-xs);
+  color: var(--color-on-surface-muted);
+}
+
+.skeleton-line {
+  height: 14px;
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-3);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.09) 37%,
+    rgba(255, 255, 255, 0.04) 63%
+  );
+  background-size: 400% 100%;
+  animation: skeleton-pulse 1.6s ease-in-out infinite;
+}
+
+.skeleton-line:last-child {
+  margin-bottom: 0;
+}
+
+@keyframes skeleton-pulse {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-line {
+    animation: none;
+  }
+}
+
+.card-error {
+  margin: 0;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+  color: var(--color-on-surface-muted);
+}
+
+.card-retry {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  min-height: 40px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.card-retry:hover:not(:disabled) {
+  background: rgba(0, 148, 198, 0.24);
+}
+
+.card-retry:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Carte cliquable ---------- */
+
+.spot-card.is-clickable {
+  cursor: pointer;
+}
+
+.spot-card.is-clickable:hover,
+.spot-card.is-clickable:focus-visible {
+  transform: translateY(-3px);
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-glow-primary), var(--shadow-card);
+}
+
+.card-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: auto;
+  padding: var(--space-3) var(--space-4);
+  min-height: 44px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.spot-card.is-clickable:hover .card-cta,
+.spot-card.is-clickable:focus-visible .card-cta {
+  background: rgba(0, 148, 198, 0.24);
+}
+
+/* ---------- Bandeau semaine ---------- */
+
+.week-band-section {
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-background-alt);
+}
+
+.week-band-inner {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: var(--space-12) var(--space-6);
+}
+
+@media (min-width: 1680px) {
+  .week-band-inner {
+    max-width: var(--content-max-width-wide);
+  }
+}
+
+.week-band-title {
+  margin: 0 0 var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-on-surface-muted);
+}
+
+.week-band {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+@media (min-width: 640px) {
+  .week-band {
+    gap: var(--space-4);
+  }
+}
+
+@media (min-width: 1280px) {
+  .week-band {
+    gap: var(--space-6);
+  }
+}
+
+.week-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-2);
+  min-width: 0;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  transition: border-color var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out);
+}
+
+.week-day.is-today {
+  border-color: var(--color-border-strong);
+  background: var(--color-primary-soft);
+}
+
+.week-day-label {
+  font-size: var(--text-sm);
+  color: var(--color-on-surface-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.week-day-dot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-family: var(--font-display);
+  line-height: 1;
+  color: var(--ink-black);
+}
+
+.week-day-score {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.week-day-score-max {
+  font-size: 8px;
+  font-weight: 600;
+  opacity: 0.65;
+}
+
+@media (min-width: 640px) {
+  .week-day-dot {
+    width: 60px;
+    height: 60px;
+  }
+
+  .week-day-score {
+    font-size: var(--text-lg);
+  }
+
+  .week-day-score-max {
+    font-size: 10px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .week-day-dot {
+    width: 72px;
+    height: 72px;
+  }
+
+  .week-day-score {
+    font-size: var(--text-xl);
+  }
+
+  .week-day-score-max {
+    font-size: 11px;
+  }
+}
+
+.week-band-title-short {
+  display: none;
+}
+
+.week-day-dot.status-success {
+  background: var(--color-success);
+  box-shadow: 0 0 0 4px var(--color-success-soft);
+}
+.week-day-dot.status-warning {
+  background: var(--color-warning);
+  box-shadow: 0 0 0 4px var(--color-warning-soft);
+}
+.week-day-dot.status-danger {
+  background: var(--color-danger);
+  box-shadow: 0 0 0 4px var(--color-danger-soft);
+}
+
+.week-day-num {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Vue detail (modale) ---------- */
+
+.detail-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 8, 0.6);
+  backdrop-filter: blur(4px);
+  /* Marge visible sur tous les cotes, meme en mobile : la carte reste
+     toujours entouree de vide, jamais collee (et donc coupee visuellement)
+     aux bords de l'ecran. */
+  padding: var(--space-4);
+}
+
+.detail-overlay[hidden] {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .detail-overlay {
+    padding: var(--space-6);
+  }
+}
+
+body.no-scroll {
+  overflow: hidden;
+}
+
+.detail-panel {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  max-height: 88vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  background: linear-gradient(
+    180deg,
+    var(--color-surface) 0%,
+    var(--color-background-alt) 100%
+  );
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-glow-primary), 0 8px 40px rgba(0, 0, 0, 0.5);
+  padding: 0 var(--space-6) var(--space-6);
+}
+
+@media (min-width: 900px) {
+  .detail-panel {
+    max-width: 900px;
+  }
+}
+
+.detail-header {
+  /* Reste visible en haut du panneau pendant le scroll du contenu (tableau
+     heure par heure, etc.) : le nom du spot et son statut ne se perdent
+     jamais hors ecran. Marges negatives + padding : le bandeau bleede
+     jusqu'aux bords du panneau (et epouse ses coins arrondis) plutot que de
+     laisser voir le fond scrollable derriere lui sur les cotes. */
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin: 0 calc(var(--space-6) * -1);
+  padding: var(--space-6) var(--space-12) var(--space-4) var(--space-6);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.detail-panel h2 {
+  margin: 0 0 var(--space-1);
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+}
+
+.detail-close {
+  /* Positionne dans .detail-header (position: sticky, donc containing
+     block valide pour un descendant absolute) : le bouton suit le header
+     pendant le scroll au lieu de defiler avec le reste du contenu. */
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-background-alt);
+  color: var(--color-on-background);
+  font-size: var(--text-2xl);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.detail-close:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-primary);
+}
+
+.detail-section {
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.detail-section h3 {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-on-surface-muted);
+}
+
+.webcam-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  min-height: 44px;
+  background: var(--color-primary-soft);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.webcam-link:hover {
+  background: rgba(0, 148, 198, 0.24);
+}
+
+.webcam-note,
+.webcam-empty {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-xs);
+  color: var(--color-on-surface-muted);
+}
+
+.webcam-empty {
+  margin: 0;
+}
+
+.best-slot-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.best-slot-when {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  color: var(--color-on-surface);
+}
+
+.best-slot-reasons {
+  list-style: none;
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.best-slot-reasons li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+}
+
+.best-slot-reason-label {
+  color: var(--color-on-surface-muted);
+  font-weight: 500;
+}
+
+.best-slot-reason-value {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--color-on-surface);
+  text-align: right;
+}
+
+/* ---------- Tableau heure par heure (vue detail) ---------- */
+
+/* Un jour a la fois plutot qu'un unique tableau de 7 jours colles bout a
+   bout : evite le scroll horizontal interminable (56 colonnes) au profit
+   d'onglets, chacun affichant un tableau compact de 8 colonnes qui tient a
+   l'ecran avec une police normale. */
+.day-tabs {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding-bottom: var(--space-1);
+  margin-bottom: var(--space-4);
+}
+
+.day-tab {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 52px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-on-surface-muted);
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.day-tab-label {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.day-tab-num {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-on-surface);
+}
+
+.day-tab.is-selected {
+  border-color: var(--color-border-strong);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.day-tab.is-selected .day-tab-num {
+  color: var(--color-primary);
+}
+
+.hourly-table-wrap {
+  overflow-x: auto;
+  /* Empeche le scroll de "chainer" vers le panneau puis la page une fois
+     la fin du tableau atteinte (sinon on peut faire glisser tout l'ecran
+     vers la droite et reveler du vide derriere la modale). */
+  overscroll-behavior-x: contain;
+  /* Pas de padding a gauche : la colonne collee (left:0) doit demarrer pile
+     au bord de la zone de clip, sinon le contenu defile reste visible dans
+     ce padding au lieu d'etre cache derriere elle. Le padding ne reste qu'a
+     droite, pour l'aisance visuelle en fin de scroll. */
+  margin-right: calc(var(--space-6) * -1);
+  padding-right: var(--space-6);
+}
+
+.hourly-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: max-content;
+  min-width: 100%;
+}
+
+.hourly-table th,
+.hourly-table td {
+  padding: var(--space-2) var(--space-3);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.hourly-table thead th {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-on-surface-muted);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.hourly-table-hour-row th {
+  font-variant-numeric: tabular-nums;
+  padding-top: var(--space-3);
+}
+
+.hourly-table-hour-row .now-tag {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.hourly-table-corner {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.hourly-table tbody th {
+  position: sticky;
+  left: 0;
+  text-align: left;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-on-surface-muted);
+  background: var(--color-surface);
+  z-index: 1;
+}
+
+.hourly-table tbody td {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-sm);
+  color: var(--color-on-surface);
+  border-top: 1px solid var(--color-border);
+}
+
+.hourly-table td.is-now,
+.hourly-table thead th.is-now {
+  background: var(--color-primary-soft);
+}
+
+.hourly-table tbody th.is-now {
+  background: var(--color-surface);
+  box-shadow: inset 3px 0 0 var(--color-primary);
+}
+
+.table-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.table-arrow {
+  display: inline-block;
+  margin-left: var(--space-1);
+  font-size: 11px;
+  color: var(--color-on-surface-muted);
+}
+
+.table-value {
+  font-weight: 600;
+}
+
+.table-abbrev {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--color-on-surface-muted);
+}
+
+.hourly-table-caption {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-xs);
+  color: var(--color-on-surface-muted);
+  line-height: 1.6;
+}
+
+/* =====================================================================
+   Mobile (<640px) : tout regroupe ici volontairement, apres CHAQUE regle
+   de base qu'il redefinit. Un override mobile place plus haut dans le
+   fichier PERD contre une regle de base de meme specificite apparaissant
+   plus bas (l'ordre du fichier gagne a specificite egale, la presence
+   d'une media query ne change rien a ca) : c'est exactement le bug qui a
+   rendu .badge-top et la largeur de .spots-grid incorrects pendant le
+   developpement. Objectif : l'ecran entier (en-tete + bandeau semaine +
+   carrousel) tient sans scroll vertical de page.
+   ===================================================================== */
+@media (max-width: 639px) {
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .site-header,
+  .week-band-section {
+    flex-shrink: 0;
+  }
+
+  main {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* --- En-tete compacte --- */
+
+  .header-inner {
+    padding: var(--space-2) var(--space-4);
+    gap: 2px;
+    line-height: 1.2;
+  }
+
+  .brand {
+    gap: var(--space-2);
+  }
+
+  .brand-mark {
+    width: 32px;
+    height: 32px;
+    font-size: var(--text-base);
+  }
+
+  .eyebrow {
+    display: none;
+  }
+
+  .site-header h1 {
+    font-size: var(--text-xl);
+  }
+
+  .header-meta {
+    font-size: 11px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* --- Bandeau semaine : agrandi pour porter davantage l'ecran mobile,
+     quitte a reduire d'autant la hauteur laissee au carrousel. --- */
+
+  .week-band-inner {
+    padding: var(--space-4);
+    line-height: 1.2;
+  }
+
+  .week-band-title {
+    margin-bottom: var(--space-3);
+    font-size: 11px;
+  }
+
+  .week-band-title-full {
+    display: none;
+  }
+
+  .week-band-title-short {
+    display: inline;
+  }
+
+  .week-day {
+    gap: var(--space-2);
+    padding: var(--space-1) 2px;
+  }
+
+  .week-day-label {
+    font-size: 10px;
+  }
+
+  .week-day-dot {
+    width: 44px;
+    height: 44px;
+  }
+
+  .week-day-score {
+    font-size: 13px;
+  }
+
+  .week-day-score-max {
+    font-size: 8px;
+  }
+
+  .week-day-num {
+    font-size: 12px;
+  }
+
+  /* --- Carrousel horizontal a defilement automatique plutot qu'une pile
+     verticale. Une carte a la fois (avec un leger apercu de la
+     suivante). --- */
+
+  .spots-grid {
+    flex: 1 1 auto;
+    /* min-width:0 est indispensable ici : sans lui, un enfant flex refuse
+       de retrecir sous la largeur intrinseque de son contenu (piege
+       classique de flexbox) et la grille s'etalait a 1440px (sa
+       max-width desktop) au lieu des ~500px reels du viewport, poussant
+       les valeurs alignees a droite des cartes hors du cadre visible. */
+    min-width: 0;
+    max-width: 100%;
+    min-height: 0;
+    display: flex;
+    /* Etire chaque carte a la hauteur disponible : elles restent toutes
+       de la meme taille (align-items:stretch), et le contenu interne
+       (voir .card-metrics plus bas) se centre dans l'espace laisse libre
+       plutot que de creer un vide brut avant le bouton. */
+    align-items: stretch;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: var(--space-3) var(--space-4);
+    gap: var(--space-3);
+  }
+
+  .spot-card {
+    flex: 0 0 86%;
+    max-height: 100%;
+    scroll-snap-align: center;
+    padding: var(--space-4);
+    gap: var(--space-4);
+    line-height: 1.2;
+    /* Filet de securite : sur les tres petits ecrans (iPhone SE...), le
+       contenu peut deborder legerement malgre la compaction. Il scrolle
+       alors DANS la carte plutot que de faire defiler toute la page.
+       overflow-x doit etre fixe explicitement : laisser seulement
+       overflow-y implique overflow-x:auto (regle CSS peu connue, meme
+       piege que sur .detail-panel), ce qui rendait les valeurs alignees
+       a droite (colonne dd) invisibles, poussees hors du cadre visible. */
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .card-head h2 {
+    font-size: var(--text-lg);
+  }
+
+  .spot-type {
+    font-size: 11px;
+  }
+
+  .status-pill {
+    padding: var(--space-1) var(--space-3);
+    font-size: 11px;
+  }
+
+  .card-metrics {
+    /* Le contenu (bande de score + houle/vent) s'empile desormais depuis le
+       haut de la carte : plus de centrage artificiel qui creait un grand
+       vide au milieu. Le CTA garde son margin-top:auto et absorbe seul
+       l'espace restant en bas. */
+    gap: var(--space-6);
+  }
+
+  .metric-group-title {
+    margin-bottom: var(--space-2);
+    font-size: 11px;
+  }
+
+  .metric-rows {
+    gap: var(--space-2);
+  }
+
+  .metric-row {
+    padding: var(--space-1) 0;
+  }
+
+  .metric-row dt,
+  .metric-row dd {
+    font-size: 13px;
+  }
+
+  /* --- Bande de score, un peu plus aeree que le reste de la carte --- */
+
+  .score-band {
+    padding-top: var(--space-3);
+    gap: var(--space-3);
+  }
+
+  .score-number {
+    font-size: var(--text-xl);
+  }
+
+  .score-band-label {
+    font-size: 10px;
+  }
+
+  .score-breakdown {
+    gap: var(--space-3);
+  }
+
+  .score-breakdown-item {
+    grid-template-columns: 78px 1fr;
+    gap: var(--space-2);
+  }
+
+  .score-breakdown-label {
+    font-size: 10px;
+  }
+
+  .card-cta {
+    padding: var(--space-2) var(--space-3);
+    min-height: 44px;
+    font-size: 13px;
+  }
+
+  /* Repositionne a l'INTERIEUR de la carte (au lieu de deborder au-dessus
+     du bord) : .spot-card a overflow-y:auto, qui decoupe tout enfant
+     absolu depassant la boite, y compris ce badge. */
+  .badge-top {
+    top: var(--space-2);
+    left: var(--space-2);
+    font-size: 10px;
+    padding: 2px var(--space-2);
+  }
+
+  /* Le badge etant desormais a l'interieur, on pousse le titre pour qu'il
+     ne le chevauche pas. */
+  .spot-card.is-top {
+    padding-top: calc(var(--space-3) + 22px);
+  }
+
+  /* --- Points de pagination du carrousel --- */
+
+  .carousel-dots {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+  }
+
+  .carousel-dot {
+    position: relative;
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: var(--color-border-strong);
+    transition: background var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out);
+  }
+
+  /* Zone de clic elargie (~36px) sans agrandir le point visuellement. */
+  .carousel-dot::before {
+    content: "";
+    position: absolute;
+    inset: -14px;
+  }
+
+  .carousel-dot.is-active {
+    background: var(--color-primary);
+    transform: scale(1.3);
+  }
+
+  /* --- Tableau heure par heure : compacte pour tenir sur la largeur des
+     mobiles standards (iPhone, Samsung, Pixel...) sans scroll horizontal.
+     Teste jusqu'a 360px de large (Android compact) avec une marge de
+     securite d'une vingtaine de pixels. Deux changements cle par rapport au
+     desktop, au-dela des tailles reduites : la fleche de direction passe
+     sur sa propre ligne (elle gonflait la largeur de colonne collee a la
+     valeur), et le tag "maintenant" du creneau courant est cache (le
+     surlignage de couleur suffit a le signaler). --- */
+
+  .hourly-table th,
+  .hourly-table td {
+    padding: 3px 1px;
+  }
+
+  .hourly-table thead th {
+    font-size: 9px;
+  }
+
+  .hourly-table-hour-row th {
+    padding-top: var(--space-2);
+  }
+
+  .hourly-table-hour-row .now-tag {
+    display: none;
+  }
+
+  .hourly-table tbody th {
+    font-size: 9px;
+  }
+
+  .hourly-table tbody td {
+    font-size: 9px;
+  }
+
+  .table-dot {
+    width: 7px;
+    height: 7px;
+  }
+
+  .table-arrow {
+    display: block;
+    margin-left: 0;
+    font-size: 7px;
+  }
+
+  .table-abbrev {
+    margin-top: 1px;
+    font-size: 7px;
+  }
+}
