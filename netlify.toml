@@ -1,0 +1,9 @@
+[build]
+  publish = "."
+
+[functions]
+  directory = "netlify/functions"
+
+# Vendredi 16h00 heure de Tahiti (UTC-10) = samedi 02h00 UTC.
+[functions."surf-alert"]
+  schedule = "0 2 * * 6"

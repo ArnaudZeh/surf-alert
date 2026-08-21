@@ -73,16 +73,20 @@ function windScore(ventDirectionDeg, ventVitesseKmh, offshoreIdealDeg) {
 }
 
 /*
- * Mapping du score vers l'affichage feu tricolore (section 3 du prompt source).
+ * Mapping du score vers l'affichage feu tricolore. Seuils revus (avant : 35/65) :
+ * en dessous de 50, pas de bonnes conditions ; 50 a 75, bonnes conditions ;
+ * au-dela, excellentes. Seule source de verite, reutilisee partout (cartes,
+ * bandeau semaine, tableau heure par heure, alerte Telegram) : la modifier
+ * ici suffit a tout mettre a jour.
  */
 function scoreToStatus(score) {
-  if (score <= 35) {
+  if (score < 50) {
     return { level: "danger", label: "pas terrible" };
   }
-  if (score <= 65) {
-    return { level: "warning", label: "correct" };
+  if (score <= 75) {
+    return { level: "warning", label: "bonnes conditions" };
   }
-  return { level: "success", label: "ca va etre bon" };
+  return { level: "success", label: "excellentes conditions" };
 }
 
 function computeScore(spot, conditions) {
@@ -108,4 +112,10 @@ function computeScore(spot, conditions) {
       wind: Math.round(wind),
     },
   };
+}
+
+// Reutilise tel quel par la Netlify Function d'alerte (moteur isole, sans
+// dependance au DOM, prevu pour ca depuis P2).
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { computeScore, scoreToStatus };
 }

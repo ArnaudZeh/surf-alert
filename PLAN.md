@@ -146,17 +146,28 @@ Icônes générées via `assets/icons/icon-source.svg` (motif vagues, palette de
 
 ---
 
-### P5 — Alerte Telegram (Netlify Scheduled Function)
+### P5 — Alerte Telegram (Netlify Scheduled Function) ✅ VALIDÉE
 **Périmètre :**
-- [ ] Bot créé via BotFather, token + chat_id en variables d'environnement Netlify (jamais en dur)
-- [ ] Scheduled Function cron : vendredi 16h Tahiti = samedi 02h00 UTC
-- [ ] Logique : prévisions samedi/dimanche, envoi si au moins un spot ≥ score 66
-- [ ] Format du message (spot(s), jour, créneau, houle, vent, lien dashboard)
+- [x] Bot créé via BotFather, token + chat_id en variables d'environnement Netlify (jamais en dur)
+- [x] Scheduled Function cron : vendredi 16h Tahiti = samedi 02h00 UTC
+- [x] Logique : prévisions samedi/dimanche, envoi si au moins un spot atteint "bonnes conditions" ou mieux (score ≥ 50, voir revue des seuils ci-dessous)
+- [x] Format du message (spot(s), jour, créneau, houle, vent, lien dashboard)
 
 **Gate P5 :**
-1. Déclenchement manuel de la fonction → message Telegram reçu, bien formaté
-2. Aucun token ou secret en dur dans le code commité
-3. Test avec données simulées "aucun bon spot" → aucun message envoyé (pas de faux positif)
+1. [x] Déclenchement manuel de la fonction → message Telegram reçu, bien formaté. Bot `@surf_alert_tahiti_bot` créé, chat_id récupéré via `getUpdates` (le bouton "Start" de Telegram Web est resté silencieux côté utilisateur, contourné par `/start` tapé manuellement dans l'app). Testé à deux niveaux : `curl` brut (connectivité token/chat_id), puis un run réel du handler avec le seuil temporairement forcé à 0 (revert immédiat après) pour valider le vrai chemin de code, format inclus.
+2. [x] Aucun token ou secret en dur dans le code commité
+3. [x] Test avec données simulées "aucun bon spot" → aucun message envoyé (pas de faux positif). Revérifié avec les vraies données du week-end du 22-23 août 2026 (scores 38-47, sous le seuil) : aucun envoi tenté.
+
+Implémentation : `netlify/functions/surf-alert.js`, déclenché par `netlify.toml` (`[functions."surf-alert"] schedule = "0 2 * * 6"`). Réutilise tel quel `js/score.js`, `js/api.js` et `js/format.js` (prévu depuis P2 : ce sont des scripts vanilla sans dépendance au DOM), en leur ajoutant chacun un export CommonJS conditionnel (`if (typeof module !== "undefined")`) qui ne s'active que côté Node, sans rien changer à leur usage navigateur existant.
+
+`nextWeekendDates()` calcule toujours le **prochain** samedi/dimanche à partir de l'heure de Tahiti (jamais "aujourd'hui" même si la fonction est déclenchée manuellement un samedi), pour rester robuste à un test manuel n'importe quel jour de la semaine. Pour chaque spot et chaque jour cible, seul le meilleur créneau est retenu (évite un message avec 20 lignes quasi identiques si toute une journée est bonne).
+
+Secrets (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`) lus uniquement via `process.env`, jamais en dur. `.env` (local, gitignored) + `.env.example` (commité, sans valeurs) pour le test local via `node scripts/test-surf-alert.js` (`--dry-run` pour voir le message sans appeler Telegram) : sert de filet en l'absence du CLI Netlify pour invoquer la fonction manuellement.
+
+**Retour utilisateur post-premier envoi, deux révisions :**
+- **Seuils de score et libellés revus (impacte aussi l'UI, pas seulement l'alerte).** `scoreToStatus` dans `js/score.js` passe de 0-35/36-65/66-100 ("pas terrible"/"correct"/"ça va être bon") à **0-49/50-75/76-100** ("pas terrible"/"bonnes conditions"/"excellentes conditions"), sur demande explicite de l'utilisateur. Cette fonction est la seule source de vérité pour les couleurs et libellés partout dans l'app (cartes, bandeau semaine, tableau heure par heure) *et* pour la fonction d'alerte : `surf-alert.js` n'a plus de seuil dupliqué (`SCORE_THRESHOLD` supprimé), un créneau qualifie dès que `scoreToStatus(score).level !== "danger"`. Un seul endroit à modifier si les seuils rebougent.
+  - Vérifié que les nouveaux libellés plus longs ne cassent pas le mobile : le badge de la vue détail passe à la ligne proprement (`flex-wrap: wrap` sur `.detail-header`) même avec le libellé le plus long ("excellentes conditions maintenant") à 328px de large. Sur la carte (`.card-head`, pas de `flex-wrap`), le pire cas mesuré (nom de spot le plus long + libellé le plus long) redistribue le titre sur une ligne de plus (3 → 4 lignes) mais rien n'est coupé ni ne déborde (`overflow-x: hidden` déjà en filet de sécurité sur `.spot-card`) ; pas une régression, ce nom de spot wrappait déjà sur 3 lignes avant.
+- **Message Telegram redesigné.** Texte dense sur une seule ligne par créneau remplacé par un format `parse_mode: "HTML"` : titre en gras, un bloc par créneau (nom du spot en gras + 3 lignes courtes : jour/heure/score, houle, vent), regroupé par palier ("🟢 Excellentes conditions" / "🟡 Bonnes conditions") avec le titre de section repris directement du label de `scoreToStatus` (encore une fois, pas de texte dupliqué qui pourrait diverger). Bug trouvé et corrigé pendant le test : une ligne vide superflue s'affichait après chaque titre de section (double `\n\n` involontaire). Rendu HTML vérifié en conditions réelles (Telegram a bien interprété les balises `<b>` en gras).
 
 ---
 

@@ -117,3 +117,17 @@ function formatHourOnly(isoLocalTime) {
   const [, time] = isoLocalTime.split("T");
   return `${time.slice(0, 2)}h`;
 }
+
+// Reutilise tel quel par la Netlify Function d'alerte.
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = {
+    degToCompassLabel,
+    degToCompassAbbrev,
+    windForceLabel,
+    currentTahitiHourString,
+    dayLabelFromIsoLocal,
+    dayNumberFromIsoLocal,
+    formatSlotLabel,
+    formatHourOnly,
+  };
+}

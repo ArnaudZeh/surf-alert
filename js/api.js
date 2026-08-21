@@ -80,3 +80,10 @@ async function fetchSpotForecast(spot) {
 
   return { hourly };
 }
+
+// Reutilise tel quel par la Netlify Function d'alerte (js/api.js n'a aucune
+// dependance au DOM) : `module` n'existe pas dans un <script> navigateur
+// classique, cette branche ne s'execute donc que cote Node.
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { fetchSpotForecast, clearForecastCache };
+}
