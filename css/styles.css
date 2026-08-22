@@ -126,13 +126,22 @@ a {
 
 @media (min-width: 640px) {
   .spots-grid {
-    grid-template-columns: repeat(2, 1fr);
+    /* minmax(0, 1fr) et non 1fr seul : une piste de grille en 1fr a un
+       plancher implicite de minmax(auto, 1fr), "auto" valant le min-content
+       de son contenu. Une valeur non cassable (white-space:nowrap sur les
+       directions type "Est-Sud-Est" dans .metric-row dd) forcait donc la
+       grille entiere a deborder au-dela de sa max-width, invisible car
+       html/body sont en overflow-x:hidden (voir plus bas) : la derniere
+       carte se retrouvait coupee au bord de l'ecran. Meme piege que
+       min-width:auto sur .spots-grid en flex mobile (Suivi #4), version
+       CSS Grid. */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (min-width: 1280px) {
   .spots-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--space-8);
   }
 }
@@ -147,6 +156,12 @@ a {
 
 .spot-card {
   position: relative;
+  /* Container query pour .card-metrics ci-dessous : la largeur de la carte
+     depend du nombre de colonnes de la grille (1 a 4), pas seulement de la
+     largeur d'ecran, donc un breakpoint en @media base sur le viewport
+     mesure la mauvaise chose (voir le bug des lignes Houle/Vent qui
+     debordaient en grille 4 colonnes sur ecran 13 pouces). */
+  container-type: inline-size;
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
@@ -276,7 +291,15 @@ a {
   gap: var(--space-6);
 }
 
-@media (min-width: 480px) {
+/* Seuil mesure empiriquement (voir historique) : en dessous de ~410px de
+   largeur de CARTE, "Direction" + "Est-Sud-Est" (le contenu le plus long,
+   white-space:nowrap) deborde de sa colonne une fois Houle et Vent cote a
+   cote. Une @container mesure le CONTENT-BOX du conteneur, pas sa largeur
+   totale : il faut donc retrancher le padding de .spot-card (2 x
+   --space-8 = 64px) et sa bordure (2 x 1px) du seuil vise, sinon la regle
+   ne se declenche que ~65px trop tard. 350px (content-box) correspond a
+   ~416px de carte, avec la meme petite marge de securite. */
+@container (min-width: 350px) {
   .card-metrics {
     flex-direction: row;
     gap: var(--space-6);
