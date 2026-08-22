@@ -171,17 +171,21 @@ Secrets (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`) lus uniquement via `process.e
 
 ---
 
-### P6 — Sécurité & hardening
+### P6 — Sécurité & hardening ✅ VALIDÉE
 **Périmètre :**
-- [ ] Recherche de secrets en dur dans le repo (`grep`)
-- [ ] `.env` / secrets dans `.gitignore`
-- [ ] Vérification que la Scheduled Function n'est pas déclenchable publiquement de façon abusive
-- [ ] Audit rapide des dépendances si un `package.json` est introduit
+- [x] Recherche de secrets en dur dans le repo (`grep`)
+- [x] `.env` / secrets dans `.gitignore`
+- [x] Vérification que la Scheduled Function n'est pas déclenchable publiquement de façon abusive
+- [x] Audit rapide des dépendances si un `package.json` est introduit
 
 **Gate P6 :**
-1. Aucun token/clé trouvé en clair dans le repo
-2. `.env` et équivalents absents du contrôle de version
-3. La fonction Telegram n'est pas exposée en endpoint public appelable librement
+1. [x] Aucun token/clé trouvé en clair dans le repo. `git grep` sur les motifs token/secret/api_key/password/bearer dans tous les fichiers suivis : rien en dehors de `process.env.TELEGRAM_*` et des placeholders vides de `.env.example`. Scan large complémentaire (chaînes de 32+ caractères alphanumériques) : uniquement des faux positifs (noms de fichiers longs). Recherche du token Telegram réel dans tout l'historique git (`git log --all -p`) : jamais présent, y compris avant qu'il soit mis dans `.env`.
+2. [x] `.env` et équivalents absents du contrôle de version. Confirmé jamais tracké (`git log --all --full-history -- .env`, vide) et actuellement ignoré (`git status --ignored`). `.gitignore` étendu à `.env.local` et `.env.*.local` (conventions courantes non couvertes par la seule entrée `.env`). Permissions du fichier resserrées à `600` (lecture/écriture propriétaire seulement, c'était `644` par défaut).
+3. [x] La fonction Telegram n'est pas exposée en endpoint public appelable librement. Vérifié sur la doc officielle Netlify (pas juste supposé) : "You can't invoke scheduled functions directly with a URL [...] similar to event-triggered functions, you can't invoke them directly with a URL" pour les déploiements publiés. Contrairement a une fonction Netlify classique, une Scheduled Function n'a tout simplement pas de route HTTP publique en production ; seuls le scheduler de Netlify, le bouton "Run now" de l'UI, ou le CLI (`netlify functions:invoke`) peuvent la déclencher. Aucun code de garde supplémentaire necessaire dans `surf-alert.js`. Source : [docs.netlify.com/build/functions/scheduled-functions](https://docs.netlify.com/build/functions/scheduled-functions/).
+
+`package.json` : toujours absent, aucune dependance npm utilisee (fetch et AbortController natifs a Node 18+, disponibles dans le runtime Netlify Functions) — l'audit de dependances n'a donc rien a auditer, conformement a l'item conditionnel du perimetre.
+
+Verification complementaire hors perimetre strict de la gate mais dans l'esprit de la phase : pas de surface XSS identifiee dans `js/app.js` (seules donnees templatees dans le HTML : `data/spots.json`, statique et control par le developpeur, jamais d'input utilisateur ni de texte libre venant de l'API Open-Meteo, qui ne renvoie que des valeurs numeriques passees par des formatteurs a vocabulaire fixe dans `js/format.js`).
 
 ---
 
