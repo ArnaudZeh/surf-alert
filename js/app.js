@@ -105,8 +105,8 @@ function renderReadyCard(spot, current, isSpotDuJour, existingArticle = null) {
   const ventDirLabel = degToCompassLabel(current.ventDirectionDeg);
   const ventForce = windForceLabel(current.ventVitesseKmh);
 
-  const breakdownRow = (label, value) => `
-    <div class="score-breakdown-item">
+  const breakdownRow = (label, value, title = "") => `
+    <div class="score-breakdown-item"${title ? ` title="${title}"` : ""}>
       <span class="score-breakdown-label">${label}</span>
       <div class="score-breakdown-track">
         <div class="score-breakdown-fill status-${scoreToStatus(value).level}" style="width: ${value}%"></div>
@@ -129,7 +129,13 @@ function renderReadyCard(spot, current, isSpotDuJour, existingArticle = null) {
           </div>
           <div class="score-breakdown">
             ${breakdownRow("Taille houle", breakdown.houleSize)}
+            ${breakdownRow(
+              "Taille vagues",
+              breakdown.tailleVagues,
+              "Estimation de la hauteur de deferlement a la cote, a partir de la houle et de la periode (donnee non fournie directement par Open-Meteo)."
+            )}
             ${breakdownRow("Direction houle", breakdown.houleDirection)}
+            ${breakdownRow("Periode", breakdown.houlePeriode)}
             ${breakdownRow("Vent", breakdown.wind)}
           </div>
         </div>

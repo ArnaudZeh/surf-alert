@@ -32,11 +32,11 @@ const dryRun = process.argv.includes("--dry-run");
 const surfAlert = require("../netlify/functions/surf-alert.js");
 
 async function main() {
-  const [saturday, sunday] = surfAlert.nextWeekendDates();
-  console.log(`Week-end cible : ${saturday} (samedi) / ${sunday} (dimanche)`);
+  const [today, tomorrow] = surfAlert.upcomingWindowDates();
+  console.log(`Fenetre ciblee : ${today} (aujourd'hui) / ${tomorrow} (demain)`);
 
   if (dryRun) {
-    const hits = await surfAlert.findWeekendHits();
+    const hits = await surfAlert.findUpcomingHits();
     if (hits.length === 0) {
       console.log("Aucun spot au-dessus du seuil : aucun message ne serait envoye.");
       return;

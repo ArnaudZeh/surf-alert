@@ -1,18 +1,28 @@
 /*
- * Netlify Scheduled Function (P5, voir PLAN.md) : verifie les previsions du
- * week-end a venir (samedi + dimanche) pour les 4 spots, et envoie une alerte
- * Telegram si au moins un spot atteint au moins "bonnes conditions" (score
- * >= 50, voir scoreToStatus dans js/score.js) sur l'un des deux jours. Aucun
- * envoi si aucun spot ne passe le seuil (pas de faux positif).
+ * Netlify Scheduled Function (P5, voir PLAN.md) : verifie les previsions
+ * d'aujourd'hui et demain pour les 4 spots, et envoie une alerte Telegram si
+ * au moins un spot atteint au moins "bonnes conditions" (score > 65, level
+ * "good" ou "success", voir scoreToStatus dans js/score.js) sur l'un des
+ * deux jours. Le palier "conditions passables" (50-65) ne declenche pas
+ * d'alerte : nuance utile sur le dashboard, pas assez engageant pour
+ * deranger l'utilisateur. Aucun envoi si aucun spot ne passe le seuil (pas
+ * de faux positif).
  *
- * Declenchement : cron "0 2 * * 6" dans netlify.toml, soit samedi 02h00 UTC
- * = vendredi 16h00 heure de Tahiti (UTC-10).
+ * Declenchement : cron "0 2,16 * * *" dans netlify.toml, deux fois par jour,
+ * soit 06h00 et 16h00 heure de Tahiti (UTC-10) :
+ * - 16h la veille (avance) : previent du lendemain avant la fin de journee.
+ * - 6h le jour meme (confirmation) : re-verifie avec des donnees de
+ *   prevision plus fraiches et plus fiables a courte echeance, au cas ou la
+ *   fenetre se soit degradee ou amelioree depuis la veille.
+ * Pas de memoire entre les executions : si une bonne fenetre dure plusieurs
+ * jours, l'alerte se repete a chaque passage plutot que de ne prevenir
+ * qu'une fois (choix delibere, garde simple, pas de stockage a gerer).
  *
  * Reutilise le moteur de score et l'acces Open-Meteo du dashboard (js/score.js,
  * js/api.js, js/format.js sont des scripts vanilla sans dependance au DOM,
  * exportes en CommonJS pour Node en plus de leur usage navigateur). Le seuil
  * n'est pas duplique ici : on reutilise scoreToStatus (source unique aussi
- * pour les couleurs de l'UI), un spot qualifie des qu'il n'est plus "danger".
+ * pour les couleurs de l'UI) et on filtre sur son "level".
  */
 
 const spots = require("../../data/spots.json");
@@ -31,16 +41,13 @@ function addDays(dateKey, days) {
   return date.toISOString().slice(0, 10);
 }
 
-// Prochain samedi et dimanche a partir d'aujourd'hui (heure de Tahiti) :
-// jamais "aujourd'hui" si on tombe deja un samedi (declenchement manuel un
-// samedi, par exemple), toujours le week-end a venir.
-function nextWeekendDates() {
+// Aujourd'hui et demain, heure de Tahiti. Fenetre glissante volontairement
+// courte : couvre "jour/jour suivant" et, quand elle approche, le week-end,
+// sans avoir a le detecter explicitement (le vendredi verifie deja
+// vendredi+samedi, le samedi verifie samedi+dimanche).
+function upcomingWindowDates() {
   const todayKey = currentTahitiHourString().slice(0, 10);
-  const todayWeekday = new Date(`${todayKey}T00:00:00Z`).getUTCDay(); // 0 = dimanche ... 6 = samedi
-  const daysUntilSaturday = ((6 - todayWeekday) % 7 + 7) % 7 || 7;
-  const saturday = addDays(todayKey, daysUntilSaturday);
-  const sunday = addDays(saturday, 1);
-  return [saturday, sunday];
+  return [todayKey, addDays(todayKey, 1)];
 }
 
 // Meilleur creneau du spot pour une date donnee, ou null si aucune donnee
@@ -55,17 +62,21 @@ function bestSlotForDate(spot, hourly, dateKey) {
   return best;
 }
 
-async function findWeekendHits() {
-  const [saturday, sunday] = nextWeekendDates();
+async function findUpcomingHits() {
+  const [today, tomorrow] = upcomingWindowDates();
   const hits = [];
 
   for (const spot of spots) {
     const { hourly } = await fetchSpotForecast(spot);
-    for (const dateKey of [saturday, sunday]) {
+    for (const dateKey of [today, tomorrow]) {
       const best = bestSlotForDate(spot, hourly, dateKey);
       if (!best) continue;
       const status = scoreToStatus(best.score);
-      if (status.level === "danger") continue;
+      // Alerte a partir de "bonnes conditions" (level "good", score > 65),
+      // pas des "conditions passables" (level "warning", 50-65) : le palier
+      // passable existe pour nuancer l'affichage sur le dashboard, mais ne
+      // justifie pas de deranger l'utilisateur.
+      if (status.level !== "good" && status.level !== "success") continue;
       hits.push({ spot, entry: best.entry, score: best.score, status });
     }
   }
@@ -90,13 +101,16 @@ function formatHit(hit) {
   );
 }
 
-const TIER_EMOJI = { success: "🟢", warning: "🟡" };
+const TIER_EMOJI = { success: "🟢", good: "🟡" };
 
 // Regroupe par palier (excellentes conditions d'abord, puis bonnes), avec le
 // libelle du palier repris directement de scoreToStatus : pas de texte
 // duplique qui pourrait diverger de l'UI si les seuils bougent encore.
+// Le palier "warning" (conditions passables, 50-65) est volontairement
+// absent : voir le filtre dans findUpcomingHits, qui n'alerte qu'a partir
+// de "bonnes conditions" desormais.
 function buildMessage(hits) {
-  const tiers = ["success", "warning"]
+  const tiers = ["success", "good"]
     .map((level) => ({ level, hits: hits.filter((hit) => hit.status.level === level) }))
     .filter((tier) => tier.hits.length > 0);
 
@@ -110,6 +124,7 @@ function buildMessage(hits) {
 
   return [
     "🌊 <b>Alerte Surf, cote nord de Tahiti</b>",
+    "Aujourd'hui ou demain :",
     ...sections,
     ...(dashboardUrl ? [`Dashboard : ${dashboardUrl}`] : []),
   ].join("\n\n");
@@ -138,10 +153,10 @@ async function sendTelegramMessage(text) {
 
 exports.handler = async () => {
   try {
-    const hits = await findWeekendHits();
+    const hits = await findUpcomingHits();
 
     if (hits.length === 0) {
-      console.log("Aucun spot au-dessus du seuil ce week-end, aucune alerte envoyee.");
+      console.log("Aucun spot au-dessus du seuil aujourd'hui/demain, aucune alerte envoyee.");
       return { statusCode: 200, body: "no-alert" };
     }
 
@@ -157,6 +172,6 @@ exports.handler = async () => {
 };
 
 // Expose pour le script de test local (voir scripts/test-surf-alert.js).
-exports.nextWeekendDates = nextWeekendDates;
-exports.findWeekendHits = findWeekendHits;
+exports.upcomingWindowDates = upcomingWindowDates;
+exports.findUpcomingHits = findUpcomingHits;
 exports.buildMessage = buildMessage;

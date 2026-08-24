@@ -1,6 +1,8 @@
 /*
- * Moteur de score (section 3 du prompt source).
- * Score 0-100 = taille de houle (30%) + direction de houle (35%) + vent (35%).
+ * Moteur de score (section 3 du prompt source, revu apres P6 sur demande
+ * utilisateur pour integrer periode et taille de deferlement estimee).
+ * Score 0-100 = taille houle brute (15%) + taille vagues au deferlement
+ * estimee (15%) + direction houle (25%) + periode (15%) + vent (30%).
  * Convention meteo : degre = direction d'ou vient houle/vent.
  */
 
@@ -32,6 +34,47 @@ function houleSizeScore(houleM, houleMinM) {
   if (houleM <= plateauEnd) return 100;
 
   return clamp(100 - (houleM - plateauEnd) * decayRatePerMeter, 0, 100);
+}
+
+// Indice de deferlement de McCowan (Hb = indice x profondeur d'eau au point
+// de deferlement, ~0.78 pour une plage a pente moderee) : voir
+// estimateBreakingHeightM ci-dessous.
+const BREAKER_INDEX = 0.78;
+const GRAVITY_MS2 = 9.81;
+const BREAKING_HEIGHT_CONSTANT = Math.sqrt(GRAVITY_MS2 * BREAKER_INDEX) / (4 * Math.PI);
+
+/*
+ * Estime la hauteur de deferlement a la cote ("la taille des vagues" telle
+ * que ressentie sur le spot) a partir de la houle et de la periode mesurees
+ * au large : Open-Meteo ne fournit que la houle offshore, jamais la hauteur
+ * reelle de la vague qui se casse. Derive de la conservation du flux
+ * d'energie en theorie lineaire des vagues entre le large et la zone de
+ * deferlement, combinee au critere de deferlement de McCowan (voir
+ * BREAKER_INDEX). Approximation assumee : ignore la refraction, la houle
+ * croisee et la pente reelle de chaque spot (donnee non disponible) — une
+ * estimation plausible, pas une mesure. Consequence attendue et voulue :
+ * une houle longue periode "grossit" davantage en approchant la cote que
+ * la meme hauteur en periode courte, ce qui correspond au ressenti connu
+ * des surfeurs (une houle longue periode surprend toujours par sa taille
+ * reelle comparee a la lecture au large).
+ */
+function estimateBreakingHeightM(houleM, periodeS) {
+  return Math.pow(houleM ** 2 * periodeS * BREAKING_HEIGHT_CONSTANT, 0.4);
+}
+
+/*
+ * Qualite/puissance de la houle selon sa periode, independamment de sa
+ * taille : une periode courte (mer de vent locale) est desorganisee et
+ * molle a hauteur egale, une periode longue (houle lointaine, groundswell)
+ * est propre et puissante (meme logique que la legende du tableau heure par
+ * heure dans app.js).
+ */
+function houlePeriodeScore(periodeS) {
+  const floor = 6; // en dessous : mer de vent pure, score quasi nul
+  const ceiling = 14; // au-dela : houle longue et puissante, score plein
+  if (periodeS <= floor) return 0;
+  if (periodeS >= ceiling) return 100;
+  return clamp(((periodeS - floor) / (ceiling - floor)) * 100, 0, 100);
 }
 
 /*
@@ -73,41 +116,57 @@ function windScore(ventDirectionDeg, ventVitesseKmh, offshoreIdealDeg) {
 }
 
 /*
- * Mapping du score vers l'affichage feu tricolore. Seuils revus (avant : 35/65) :
- * en dessous de 50, pas de bonnes conditions ; 50 a 75, bonnes conditions ;
- * au-dela, excellentes. Seule source de verite, reutilisee partout (cartes,
- * bandeau semaine, tableau heure par heure, alerte Telegram) : la modifier
- * ici suffit a tout mettre a jour.
+ * Mapping du score vers l'affichage feu tricolore. 4 paliers desormais
+ * (avant : 3 paliers, seuils 35/65 puis 50/75) : en dessous de 50, pas de
+ * bonnes conditions ; 50 a 65, passables ; 65 a 80, bonnes ; au-dela,
+ * excellentes. Seule source de verite, reutilisee partout (cartes, bandeau
+ * semaine, tableau heure par heure, alerte Telegram) : la modifier ici
+ * suffit a tout mettre a jour. Le niveau "good" est nouveau : il a besoin
+ * de sa propre couleur (--color-good) et de ses propres regles .status-good
+ * en CSS, en plus des 3 niveaux existants.
  */
 function scoreToStatus(score) {
   if (score < 50) {
     return { level: "danger", label: "pas terrible" };
   }
-  if (score <= 75) {
-    return { level: "warning", label: "bonnes conditions" };
+  if (score <= 65) {
+    return { level: "warning", label: "conditions passables" };
+  }
+  if (score <= 80) {
+    return { level: "good", label: "bonnes conditions" };
   }
   return { level: "success", label: "excellentes conditions" };
 }
 
 function computeScore(spot, conditions) {
   const houleSize = houleSizeScore(conditions.houleM, spot.houle_min_m);
+  const breakingHeightM = estimateBreakingHeightM(conditions.houleM, conditions.houlePeriodeS);
+  const tailleVagues = houleSizeScore(breakingHeightM, spot.houle_min_m);
   const houleDirection = houleDirectionScore(
     conditions.houleDirectionDeg,
     spot.houle_direction_ideale_deg,
     spot.houle_direction_tolerance_deg
   );
+  const houlePeriode = houlePeriodeScore(conditions.houlePeriodeS);
   const wind = windScore(
     conditions.ventDirectionDeg,
     conditions.ventVitesseKmh,
     spot.vent_offshore_ideal_deg
   );
 
-  const total = houleSize * 0.3 + houleDirection * 0.35 + wind * 0.35;
+  const total =
+    houleSize * 0.15 +
+    tailleVagues * 0.15 +
+    houleDirection * 0.25 +
+    houlePeriode * 0.15 +
+    wind * 0.3;
 
   return {
     score: Math.round(clamp(total, 0, 100)),
     breakdown: {
       houleSize: Math.round(houleSize),
+      tailleVagues: Math.round(tailleVagues),
+      houlePeriode: Math.round(houlePeriode),
       houleDirection: Math.round(houleDirection),
       wind: Math.round(wind),
     },

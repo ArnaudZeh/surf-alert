@@ -4,6 +4,8 @@
 [functions]
   directory = "netlify/functions"
 
-# Vendredi 16h00 heure de Tahiti (UTC-10) = samedi 02h00 UTC.
+# Deux fois par jour, heure de Tahiti (UTC-10) :
+# - 16h00 = 02h00 UTC le jour suivant (avance sur demain)
+# - 06h00 = 16h00 UTC le jour meme (confirmation sur aujourd'hui)
 [functions."surf-alert"]
-  schedule = "0 2 * * 6"
+  schedule = "0 2,16 * * *"

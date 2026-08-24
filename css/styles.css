@@ -253,6 +253,15 @@ a {
   color: var(--color-success);
 }
 
+.status-good .status-dot {
+  background: var(--color-good);
+  box-shadow: 0 0 0 4px var(--color-good-soft);
+}
+.status-good.status-pill {
+  background: var(--color-good-soft);
+  color: var(--color-good);
+}
+
 .status-warning .status-dot {
   background: var(--color-warning);
   box-shadow: 0 0 0 4px var(--color-warning-soft);
@@ -422,6 +431,9 @@ a {
 .score-gauge-fill.status-success {
   background: var(--color-success);
 }
+.score-gauge-fill.status-good {
+  background: var(--color-good);
+}
 .score-gauge-fill.status-warning {
   background: var(--color-warning);
 }
@@ -462,6 +474,9 @@ a {
 
 .score-breakdown-fill.status-success {
   background: var(--color-success);
+}
+.score-breakdown-fill.status-good {
+  background: var(--color-good);
 }
 .score-breakdown-fill.status-warning {
   background: var(--color-warning);
@@ -730,6 +745,10 @@ a {
 .week-day-dot.status-success {
   background: var(--color-success);
   box-shadow: 0 0 0 4px var(--color-success-soft);
+}
+.week-day-dot.status-good {
+  background: var(--color-good);
+  box-shadow: 0 0 0 4px var(--color-good-soft);
 }
 .week-day-dot.status-warning {
   background: var(--color-warning);
