@@ -4,6 +4,17 @@
  * creneau a venir, mini serie pour le graphique de la vue detail.
  */
 
+// Cote navigateur, ces fonctions existent deja dans le scope global (score.js
+// et format.js charges en <script> avant celui-ci) : ce bloc ne s'execute
+// alors jamais (pas de `require` en <script> classique). Cote Node, `var`
+// (et non `const`/`let`) est indispensable ici : une declaration `var` a
+// l'interieur d'un bloc `if` remonte quand meme au scope du fichier entier,
+// ce qui rend ces noms visibles aux fonctions plus bas.
+if (typeof require !== "undefined") {
+  var { computeScore, scoreToStatus } = require("./score.js");
+  var { currentTahitiHourString, isDaylightSlot } = require("./format.js");
+}
+
 function findCurrentHourIndex(hourly) {
   const nowKey = currentTahitiHourString();
   const exactIndex = hourly.findIndex((entry) => entry.time === nowKey);
@@ -62,6 +73,8 @@ function computeWeeklyBand(spots, hourlyBySpotId) {
 /*
  * Meilleur creneau a venir pour un spot donne, sur une fenetre de N jours
  * a partir de maintenant (defaut 5 jours, section 4 du prompt source).
+ * Creneaux de nuit ignores (isDaylightSlot, 6h-18h) : jamais recommander
+ * un "meilleur creneau" a une heure ou personne ne surfe.
  */
 function findBestUpcomingSlot(spot, hourly, { days = 5 } = {}) {
   const startIndex = findCurrentHourIndex(hourly);
@@ -70,6 +83,7 @@ function findBestUpcomingSlot(spot, hourly, { days = 5 } = {}) {
 
   let best = null;
   window.forEach((entry) => {
+    if (!isDaylightSlot(entry.time)) return;
     const { score } = computeScore(spot, entry);
     if (!best || score > best.score) {
       best = { entry, score };
@@ -112,4 +126,11 @@ function buildHourlyTable(spot, hourly, { days = 3, stepHours = 3 } = {}) {
   });
 
   return daysGrouped;
+}
+
+// Reutilise tel quel par la Netlify Function du webhook Telegram (/meteo) :
+// meme moteur, meme filtre jour, pas de troisieme reimplementation de
+// "meilleur creneau a venir".
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { getCurrentConditions, findBestUpcomingSlot };
 }

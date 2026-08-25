@@ -33,6 +33,7 @@ const {
   degToCompassLabel,
   windForceLabel,
   formatSlotLabel,
+  isDaylightSlot,
 } = require("../../js/format.js");
 
 function addDays(dateKey, days) {
@@ -51,11 +52,14 @@ function upcomingWindowDates() {
 }
 
 // Meilleur creneau du spot pour une date donnee, ou null si aucune donnee
-// pour ce jour (ex : hors des 7 jours renvoyes par Open-Meteo).
+// pour ce jour (ex : hors des 7 jours renvoyes par Open-Meteo). Creneaux de
+// nuit ignores (isDaylightSlot, 6h-18h) : jamais alerter pour un creneau a
+// une heure ou personne ne surfe.
 function bestSlotForDate(spot, hourly, dateKey) {
   let best = null;
   hourly.forEach((entry) => {
     if (entry.time.slice(0, 10) !== dateKey) return;
+    if (!isDaylightSlot(entry.time)) return;
     const { score } = computeScore(spot, entry);
     if (!best || score > best.score) best = { entry, score };
   });
@@ -175,3 +179,7 @@ exports.handler = async () => {
 exports.upcomingWindowDates = upcomingWindowDates;
 exports.findUpcomingHits = findUpcomingHits;
 exports.buildMessage = buildMessage;
+// Reutilise tel quel par le webhook Telegram (/meteo) : meme envoi, pas de
+// deuxieme implementation de l'appel a l'API Telegram.
+exports.sendTelegramMessage = sendTelegramMessage;
+exports.escapeHtml = escapeHtml;

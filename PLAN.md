@@ -226,6 +226,35 @@ Site live : **surf-alert-tahiti.netlify.app**. Vérifié après déploiement : d
 
 ---
 
+### P8 — Commande Telegram `/meteo` à la demande (hors plan initial, demandée après P7)
+
+**Périmètre :**
+- [x] Nouvelle fonction Netlify **non planifiée** (`telegram-webhook.js`) répondant à `/meteo` : score actuel + houle/vent du moment, et meilleur créneau à venir (5 jours), par spot
+- [x] Filtre "heures de jour" (6h-18h) appliqué à toute sélection de "meilleur créneau", pas seulement à cette nouvelle commande
+- [x] Sécurisation de l'endpoint (nécessairement public, contrairement à la Scheduled Function)
+- [ ] Webhook enregistré auprès de Telegram et testé en conditions réelles (dépend du déploiement, voir plus bas)
+
+**Gate P8 :**
+1. [x] `/meteo` renvoie une réponse correcte, testé en local avec le vrai `handler()` (pas juste `buildMeteoReply`) et un update Telegram simulé
+2. [x] Une requête sans le bon secret webhook est rejetée (401), un message d'un autre `chat_id` ou un texte non reconnu est ignoré silencieusement (200, aucun appel à Telegram)
+3. [x] Aucun créneau nocturne ne peut plus être recommandé comme "meilleur créneau", vérifié en local (Node) et dans le navigateur
+
+**Pourquoi une fonction séparée plutôt qu'étendre `surf-alert.js`.** Une Scheduled Function n'a pas d'URL publique (garantie vérifiée en P6) : c'est exactement ce qui la protège d'un déclenchement abusif, mais ça la rend aussi incapable de recevoir les messages entrants de Telegram. Répondre à un message nécessite un webhook, donc une fonction Netlify **classique**, avec URL publique. Cette fonction n'a donc pas la même protection "gratuite" que l'alerte planifiée, d'où deux vérifications propres à `telegram-webhook.js` :
+- **Secret de webhook** (`TELEGRAM_WEBHOOK_SECRET`, généré une fois, jamais en dur) : Telegram l'inclut dans un header (`X-Telegram-Bot-Api-Secret-Token`) sur chaque appel réel ; toute requête qui ne le présente pas correctement est rejetée avant même d'être lue.
+- **Filtre sur `chat_id`** : même avec le bon secret, un message venant d'un autre chat que celui de l'utilisateur est ignoré silencieusement (pas d'erreur qui confirmerait au tiers que quelque chose a été reçu).
+
+**Filtre "heures de jour" (6h-18h), appliqué partout, pas juste pour `/meteo`.** Consigne explicite de l'utilisateur ("on surfe de 6h du matin à 18h du soir, le reste on s'en fiche"), et occasion de corriger un vrai defaut deja observe en pratique : un test anterieur de l'alerte hebdomadaire (P5) avait recommande un creneau a "00:00" (minuit), ce qui n'avait aucun sens. Nouvelle fonction `isDaylightSlot` dans `js/format.js` (simplification volontaire a heures fixes, pas de calcul astronomique lever/coucher du soleil), appliquee a la selection de "meilleur creneau" dans **3 endroits** qui en avaient chacun leur propre logique : `js/insights.js` (`findBestUpcomingSlot`, utilise par le dashboard **et** desormais par `/meteo`), `netlify/functions/surf-alert.js` (`bestSlotForDate`, l'alerte planifiee). Seule l'affichage des **conditions actuelles** (peu importe l'heure) n'est pas filtre : montrer l'etat de la houle a 2h du matin reste une information valide, ce n'est que la RECOMMANDATION de creneau qui n'a pas de sens la nuit.
+
+**`js/insights.js` gagne son export Node**, comme les 3 autres fichiers vanilla du dashboard, pour que `/meteo` reutilise `getCurrentConditions` et `findBestUpcomingSlot` telles quelles plutot que de les reimplementer une troisieme fois. Subtilite technique documentee dans le fichier : `insights.js` est le premier a *consommer* des fonctions d'autres fichiers (`computeScore`, `scoreToStatus`, `currentTahitiHourString`, `isDaylightSlot`) plutot que d'etre une simple feuille sans dependance ; cote navigateur ces noms existent deja dans le scope global (scripts charges avant), cote Node il faut un `require` explicite. Fait via `var` (pas `const`/`let`) a l'interieur d'un `if (typeof require !== "undefined")` : la remontee de portee de `var` rend les noms visibles a tout le fichier meme si la condition ne s'execute jamais (cas navigateur), sans ecraser les globales existantes.
+
+**`sendTelegramMessage` et `escapeHtml` exportes depuis `surf-alert.js`** et reutilises tels quels par `telegram-webhook.js` : un seul endroit qui appelle l'API Telegram, pas de deuxieme implementation qui pourrait diverger.
+
+Nouveau script `scripts/setup-telegram-webhook.js` : appelle `setWebhook` (branche l'URL du site au secret) et `setMyCommands` (fait apparaitre `/meteo` en autocompletion dans Telegram) en une fois, a relancer si l'URL du site ou le secret changent. Comme les autres scripts locaux, lit les secrets depuis `.env`, jamais en argument de commande.
+
+**Reste a faire :** deployer (push GitHub -> deploi auto Netlify existant), ajouter `TELEGRAM_WEBHOOK_SECRET` aux variables d'environnement du site en production, executer `setup-telegram-webhook.js` une fois contre l'URL reelle, puis tester `/meteo` directement depuis Telegram (pas juste simule en local) pour valider le chemin complet Telegram -> webhook Netlify -> reponse.
+
+---
+
 ## Risques
 
 | Risque | Probabilité | Impact | Mitigation |

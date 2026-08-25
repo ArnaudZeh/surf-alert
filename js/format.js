@@ -118,6 +118,22 @@ function formatHourOnly(isoLocalTime) {
   return `${time.slice(0, 2)}h`;
 }
 
+const DAYLIGHT_START_HOUR = 6;
+const DAYLIGHT_END_HOUR = 18;
+
+/*
+ * Un creneau la nuit n'a aucun interet a etre recommande comme "meilleur
+ * creneau" (il fait nuit, personne ne surfe) : simplification volontaire a
+ * heures fixes (6h-18h) plutot qu'un calcul astronomique de lever/coucher
+ * du soleil, sur demande explicite de l'utilisateur. Seule la SELECTION du
+ * meilleur creneau utilise ce filtre ; l'affichage des conditions actuelles
+ * (peu importe l'heure) n'y est pas soumis.
+ */
+function isDaylightSlot(isoLocalTime) {
+  const hour = Number(isoLocalTime.slice(11, 13));
+  return hour >= DAYLIGHT_START_HOUR && hour <= DAYLIGHT_END_HOUR;
+}
+
 // Reutilise tel quel par la Netlify Function d'alerte.
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
@@ -129,5 +145,6 @@ if (typeof module !== "undefined" && module.exports) {
     dayNumberFromIsoLocal,
     formatSlotLabel,
     formatHourOnly,
+    isDaylightSlot,
   };
 }
