@@ -207,16 +207,22 @@ Verification complementaire hors perimetre strict de la gate mais dans l'esprit 
 
 ---
 
-### P7 — Déploiement Netlify / Go-live
+### P7 — Déploiement Netlify / Go-live 🟡 EN COURS (1 et 2 faits, 3 nécessite du temps réel)
 **Périmètre :**
-- [ ] Déploiement Netlify (repo connecté ou déploiement manuel)
-- [ ] Variables d'environnement configurées en production
+- [x] Déploiement Netlify (repo connecté ou déploiement manuel)
+- [x] Variables d'environnement configurées en production
 - [ ] Observation réelle sur plusieurs jours avant de faire confiance à l'alerte
 
 **Gate P7 :**
-1. Le dashboard est accessible en ligne (URL Netlify)
-2. La Scheduled Function se déclenche à l'heure prévue (vérifié dans les logs Netlify)
-3. Sur plusieurs jours réels, les scores affichés correspondent à l'observation terrain (cf. points à vérifier section 7 du prompt source : vent idéal Orofara/Ahonu, coordonnées Ahonu, webcam L'embouchure)
+1. [x] Le dashboard est accessible en ligne (URL Netlify)
+2. [x] La Scheduled Function se déclenche à l'heure prévue (vérifié dans les logs Netlify)
+3. [ ] Sur plusieurs jours réels, les scores affichés correspondent à l'observation terrain (cf. points à vérifier section 7 du prompt source : vent idéal Orofara/Ahonu, coordonnées Ahonu, webcam L'embouchure)
+
+Dépôt GitHub créé (`gh repo create`, déjà authentifié sur la session) : **github.com/ArnaudZeh/surf-alert**, public sur demande explicite de l'utilisateur (aucun secret dans le code, vérifié en P6). Connecté à Netlify via déploiement Git (pas de CLI Netlify installé sur la machine) : app GitHub de Netlify autorisée sur ce nouveau repo (elle n'avait accès qu'à un seul autre projet de l'utilisateur), import standard, build settings auto-détectés depuis `netlify.toml` (publish=".", functions="netlify/functions", aucune build command puisque site statique sans étape de build). `TELEGRAM_BOT_TOKEN` et `TELEGRAM_CHAT_ID` saisis dans le formulaire de configuration du projet avant le premier déploiement (jamais en dur dans le repo).
+
+Site live : **surf-alert-tahiti.netlify.app**. Vérifié après déploiement : dashboard charge avec données réelles, aucune erreur console, les 5 lignes du nouveau score s'affichent correctement en production. Fonction confirmée "Scheduled" dans l'UI Netlify avec le cron exact (`0 2,16 * * *`, "At 02:00 AM and 04:00 PM"), prochaine exécution affichée "Today at 4:00 PM **GMT-10**" (soit bien l'heure de Tahiti, pas une coïncidence de timezone). Déclenchement manuel via le bouton "Run now" de l'UI Netlify (pas juste un test local) : log réel de production confirmant l'exécution complète en conditions réelles — `"Aucun spot au-dessus du seuil aujourd'hui/demain, aucune alerte envoyee"`, 1006ms, 131 MB — preuve que le bundler de fonctions Netlify embarque correctement `js/api.js`, `js/score.js`, `js/format.js` et `data/spots.json` (chemins relatifs `require("../../...")`), pas seulement testé en local avec Node directement.
+
+**Reste à faire, ne dépend pas de plus de travail mais du temps qui passe :** observer les scores affichés sur plusieurs jours réels et les comparer au ressenti sur le terrain (vent idéal Orofara/Ahonu resté incertain depuis P0, cf. section Risques) avant de faire pleinement confiance à l'alerte automatique.
 
 ---
 
