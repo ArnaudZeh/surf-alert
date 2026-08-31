@@ -59,7 +59,7 @@
     "houle_direction_tolerance_deg": 45,
     "vent_offshore_ideal_deg": 180,
     "maree_ideale": "basse mer",
-    "dangers": ["courants", "requins", "eau de riviere apres forte pluie (risque sanitaire)"],
+    "dangers": ["courants", "requins", "eau de riviere apres forte pluie (risque sanitaire)", "cailloux en bout de plage (sortie d'eau compliquee)"],
     "commentaire": "Webcam potentielle mais source ancienne, verifier qu'elle tourne encore avant integration.",
     "webcam_url": "https://newstv.fr/2015/10/26/webcam-papenoo-embouchure-tahiti/"
   }

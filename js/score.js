@@ -70,7 +70,11 @@ function estimateBreakingHeightM(houleM, periodeS) {
  * heure dans app.js).
  */
 function houlePeriodeScore(periodeS) {
-  const floor = 6; // en dessous : mer de vent pure, score quasi nul
+  // Floor abaisse de 6 a 4s (P8, retour terrain L'embouchure 29/08/2026,
+  // 11h-13h : session jugee bonne avec une periode mesuree a 6.2s, alors que
+  // l'ancien plancher la notait quasi nulle des la sortie de la zone "mer de
+  // vent pure").
+  const floor = 4;
   const ceiling = 14; // au-dela : houle longue et puissante, score plein
   if (periodeS <= floor) return 0;
   if (periodeS >= ceiling) return 100;
